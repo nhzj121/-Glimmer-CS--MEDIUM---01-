@@ -21,5 +21,5 @@ int main()
     }
 }
 ```
-![屏幕截图 2024-10-03 144701](https://github.com/user-attachments/assets/e42742e8-d070-4f6f-832b-a1e3e57364e2)
+[屏幕截图 2024-10-03 144701](https://github.com/user-attachments/assets/e42742e8-d070-4f6f-832b-a1e3e57364e2)
 
