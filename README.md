@@ -73,8 +73,7 @@ int main()
 //数0 表示：n=0
 typedef struct _bign{
     int n;//数字的有效长度
-    char d[MAXN];![Uploading 存储大数.png…]()
-
+    char d[MAXN];
 }bign;
 
 //将多余的"0"去除。如“012345”变为“12345”
