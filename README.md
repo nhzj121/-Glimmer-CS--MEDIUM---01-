@@ -145,3 +145,98 @@ int main()
    return 0;
 }
 ```
+## Step 3 实现大数加法（处理负数）
+```c
+#include <stdio.h>
+#include <string.h>
+#define MAXN 40
+
+//无效位必须是0
+//数0 表示：n=0
+typedef struct _bign{
+    int n;//数字的有效长度
+    char d[MAXN];
+}bign;
+
+//将多余的"0"去除。如“012345”变为“12345”
+void Remove(bign* p)
+{ //项数不为0         最高项为0      指向前一项
+    while(p->n > 0 && p->d[p->n - 1] == 0) p->n--;
+}
+//字符串转换为bign结构体
+bign from_str(const char* s)
+{
+    bign t;
+    int i;
+    memset(&t, 0,MAXN); //将t的内存初始化为0
+    t.n = strlen(s);  //计算字符串s的长度，存储在bign类型的成员n中
+    i = t.n - 1;    //将i设置为字符串长度-1，以便从最后一个字符开始处理
+    //只要s指向的字符不是（null，'\0'）就继续循环
+    //                将字符转换为对应整数值
+    while(*s) t.d[i--]=*s++ - '0';
+    Remove(&t);
+    return t;
+}
+
+void to_str(char* buf,const bign* p)
+{
+    int i;
+    if(p->n == 0)
+    {
+        strcpy(buf,"0");
+        return;
+    }
+    i=p->n - 1;
+    while(i >= 0) *buf++ = p->d[i--] + '0';
+    *buf='\0';
+}
+
+bign add(const bign* a, const bign* b)
+{
+    bign t;
+    int i;
+    if(a->n < b->n) return add(b,a);
+
+    t = *a;
+    for(i=0;i<t.n;i++)
+    {
+        t.d[i] += b->d[i];
+        if(t.d[i] > 9)
+        {
+            t.d[i] -= 10;
+            t.d[i+1]++;
+
+        }
+    }
+    if(t.d[t.n]) t.n++;
+    return t;
+}
+
+int main()
+{
+   bign a,b,c;
+   int sign = 0;
+   char s1[40],s2[40];
+   char buf[40];
+   scanf("%s\n",s1);
+   scanf("%s",s2);
+   if(s1[0] == '-' && s2[0] == '-')
+   {
+       sign++;
+       s1[0] = '0';
+       s2[0] = '0';
+   }
+   a=from_str(s1);
+   b=from_str(s2);
+   c=add(&a,&b);
+   to_str(buf, &c);
+   if(sign == 0)
+   {
+       printf("%s\n",buf);
+   }
+   else
+   {
+       printf("-%s\n",buf);
+   }
+   return 0;
+}
