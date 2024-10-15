@@ -145,6 +145,7 @@ int main()
    return 0;
 }
 ```
+![image](https://github.com/user-attachments/assets/07dcde14-642b-425c-9b5e-3ea64eba45e9)
 ## Step 3 实现大数加法（处理负数）
 ```c
 #include <stdio.h>
