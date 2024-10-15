@@ -242,6 +242,7 @@ int main()
    return 0;
 }
 ```
+![image](https://github.com/user-attachments/assets/1464d4d9-d560-43c3-ada2-441692551168)
 ## Part 3 从表达式中提取操作数和操作符
 ```c
 #include <stdio.h>
