@@ -62,7 +62,7 @@ int main()
    return 0;
 }
 ```
-
+![image](https://github.com/user-attachments/assets/8d773e85-f1f2-4213-84ac-7b8a61b7166d)
 ## Step 2 实现大数加法
 ```c
 #include <stdio.h>
