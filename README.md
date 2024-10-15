@@ -240,3 +240,291 @@ int main()
    }
    return 0;
 }
+```
+## Part 3 从表达式中提取操作数和操作符
+```c
+#include <stdio.h>
+#include <string.h>
+#define MAXN 40
+
+//无效位必须是0
+//数0 表示：n=0
+typedef struct _bign{
+    int n;//数字的有效长度
+    char d[MAXN];
+}bign;
+
+//将多余的"0"去除。如“012345”变为“12345”
+void Remove(bign* p)
+{ //项数不为0         最高项为0      指向前一项
+    while(p->n > 0 && p->d[p->n - 1] == 0) p->n--;
+}
+//字符串转换为bign结构体,即大数的内部表示
+bign from_str(const char* s)
+{
+    bign t;
+    int i;
+    memset(&t, 0,MAXN); //将t的内存初始化为0
+    t.n = strlen(s);  //计算字符串s的长度，存储在bign类型的成员n中
+    i = t.n - 1;    //将i设置为字符串长度-1，以便从最后一个字符开始处理
+    //只要s指向的字符不是（null，'\0'）就继续循环
+    //                将字符转换为对应整数值
+    while(*s) t.d[i--]=*s++ - '0';
+    Remove(&t);
+    return t;
+}
+
+void to_str(char* buf,const bign* p)
+{
+    int i;
+    if(p->n == 0)
+    {
+        strcpy(buf,"0");
+        return;
+    }
+    i=p->n - 1;
+    while(i >= 0) *buf++ = p->d[i--] + '0';
+    *buf='\0';
+}
+
+int main()
+{
+   int i;
+   int n,m;
+   int countsub = 0,countadd = 0;
+   bign a,b,c;
+   char s0[85],s1[40],s2[40],*op;
+   char sign[]="+-";
+   char buf[40];
+   gets(s0);
+   printf("skjfh\n");
+   char *p = s0;
+   printf("%c\n",*p);//ok
+   while(*p != '\0')
+   {
+       if(*p == '-') countsub++;
+       if(*p == '+') countadd++;
+       printf("%c\n",*p);
+       p++;
+   }
+   *p='\0';
+   printf("%d%d\n",countadd,countsub);//ok
+
+   if(countsub == 0 && countadd == 1) i=0;
+   if(countsub == 1 && countadd == 0) i=1;
+   if(countsub == 2 && countadd == 1) i=2;
+   if(countsub == 3 ) i=3;
+   if(countsub == 1 && countadd == 1) i=4;
+   if(countsub == 2 && countadd == 0) i=5;
+
+   printf("%d\n",i);//ok
+
+   switch(i)
+   {
+       case 0: op = &sign[0];
+               n=0;
+               while('0'<= s0[n] <='9' && s0[n] != ' ')
+               {
+                   s1[n] = s0[n];
+                   printf("%c",s1[n]);
+                   n++;
+
+               }
+               printf("\n");
+               n += 3;
+               m=0;
+               while(s0[n] != '\0')
+               {
+                   s2[m] =s0[n];
+                   printf("%c",s2[m]);
+                   m++;
+                   n++;
+
+               }
+
+               break;
+       case 1: op = &sign[1];
+               n=0;
+               while('0'<= s0[n] <='9' && s0[n] != ' ')
+               {
+                   s1[n] = s0[n];
+                   n++;
+               }
+               n += 3;
+               m=0;
+               while(s0[n] != '\0')
+               {
+                   s2[m] =s0[n];
+                   m++;
+                   n++;
+               }
+               break;
+       case 2: op = &sign[0];
+               n=0;
+               while(('0'<= s0[n] <='9' || s0[n] == '-') && s0[n] != ' ')
+               {
+                   s1[n] = s0[n];
+                   n++;
+               }
+               n += 4;
+               m=0;
+               while(('0'<= s0[n] <='9' || s0[n] == '-') && s0[n] != '\0' && s0[n] != ')')
+               {
+                   s2[m] = s0[n];
+                   m++;
+                   n++;
+               }
+               break;
+       case 3: op = &sign[1];
+               n=1;
+               s1[0] = s0[0];
+               while('0'<= s0[n] <='9' && s0[n] != ' ')
+               {
+                   s1[n] = s0[n];
+                   n++;
+               }
+               n += 4;
+               s2[0] = s0[n];
+               m=1;
+               n++;
+               while(('0'<= s0[n] <='9' || s0[n] == '-') && s0[n] != '\0' && s0[n] != ')')
+               {
+                   s2[m] = s0[n];
+                   m++;
+                   n++;
+               }
+               break;
+       case 4: op = &sign[0];
+               if(s0[0] == '-')
+               {
+                   n=1;
+                   s1[0] = s0[0];
+                   while(('0'<= s0[n] <='9' || s0[n] == '-') && s0[n] != ' ')
+                   {
+                       s1[n] = s0[n];
+                       n++;
+                   }
+                   n += 3;
+                   m=0;
+                   while('0'<= s0[n] <='9' && s0[n] != '\0')
+                   {
+                       s2[m] = s0[n];
+                       m++;
+                       n++;
+                   }
+                   break;
+
+               }
+               else
+               {
+                   n=0;
+                   while('0'<= s0[n] <='9' && s0[n] != ' ')
+                   {
+                       s1[n] = s0[n];
+                       n++;
+                   }
+                   n += 4;
+                   m=0;
+                   while(('0'<= s0[n] <='9' || s0[n] == '-') && s0[n] != '\0' && s0[n] != ')')
+                   {
+                       s2[m] = s0[n];
+                       m++;
+                       n++;
+                   }
+                   break;
+               }
+       case 5: op = &sign[1];
+               if(s0[0] == '-')
+               {
+                   n=0;
+                   while(('0'<= s0[n] <='9' || s0[n] == '-') && s0[n] != ' ')
+                   {
+                       s1[n] = s0[n];
+                       n++;
+                   }
+                   n += 3;
+                   m=0;
+                   while('0'<= s0[n] <='9' && s0[n] != '\0')
+                   {
+                       s2[m] = s0[n];
+                       m++;
+                       n++;
+                   }
+                   break;
+               }
+               else
+               {
+                   n=0;
+                   while('0'<= s0[n] <='9' && s0[n] != ' ')
+                   {
+                       s1[n] = s0[n];
+                       n++;
+                   }
+                   n += 4;
+                   m=0;
+                   while(('0'<= s0[n] <='9' || s0[n] == '-') && s0[n] != '\0' && s0[n] != ')')
+                   {
+                       s2[m] = s0[n];
+                       m++;
+                       n++;
+                   }
+                   break;
+               }
+   }
+//ok
+   s2[m+1] = '\0';
+   if(s1[0] != '-' && s2[0] != '-')
+   {
+        a=from_str(s1);
+        b=from_str(s2);
+        to_str(buf, &a);
+        printf("操作数1：%s\n",buf);
+        to_str(buf, &b);
+        printf("操作数2：%s\n",buf);
+        printf("操作符：%c",*op);
+        return 0;
+   }
+
+   if(s1[0] =='-' && s2[0] == '-')
+   {
+        s1[0] = '0';
+        s2[0] = '0';
+        a=from_str(s1);
+        b=from_str(s2);
+        to_str(buf, &a);
+        printf("操作数1：-%s\n",buf);
+        to_str(buf, &b);
+        printf("操作数2：-%s\n",buf);
+        printf("操作符：%c",*op);
+        return 0;
+   }
+
+   if(s1[0] == '-' && s2[0] != '-')
+   {
+        s1[0] = '0';
+        a=from_str(s1);
+        b=from_str(s2);
+        to_str(buf, &a);
+        printf("操作数1：-%s\n",buf);
+        to_str(buf, &b);
+        printf("操作数2：%s\n",buf);
+        printf("操作符：%c",*op);
+        return 0;
+   }
+
+   if(s1[0] != '-' && s2[0] == '-')
+   {
+        s2[0] = '0';
+        a=from_str(s1);
+        b=from_str(s2);
+        to_str(buf, &a);
+        printf("操作数1：%s\n",buf);
+        to_str(buf, &b);
+        printf("操作数2：-%s\n",buf);
+        printf("操作符：%c",*op);
+        return 0;
+   }
+
+   return 0;
+}
+```
