@@ -301,16 +301,13 @@ int main()
    char *ps1;
    char buf[40];
    gets(s0);
-   printf("skjfh\n");
    char *p = s0;
-   printf("%c\n",*p);
    while(*p != '\0')
    {
        if(*p != ' ')
        {
             if(*p == '-') countsub++;
             if(*p == '+') countadd++;
-            printf("%c",*p);
             p++;
        }
        else
@@ -331,11 +328,9 @@ int main()
        l++;
    }
    s1[l] = '\0';
-   printf("%s\n",s1);
 
    token = strtok_r(NULL," ",&save_ptr);
    op = token;
-   printf("%c\n",*op);
 
    l=0;
    token = strtok_r(NULL," ",&save_ptr);
@@ -349,7 +344,6 @@ int main()
    if(s2[0] != '(')
    {
         s2[l] = '\0';
-        printf("%s\n",s2);
    }
     //去除括号
    else
@@ -361,7 +355,6 @@ int main()
            l++;
        }
        s2[l] = '\0';
-       printf("%s\n",s2);
    }
     //转化大数，倒序，方便后面运算
    a=from_str(s1);
