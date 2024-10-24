@@ -579,134 +579,117 @@ void to_str(char* buf, const bign* p) {
     *buf = '\0'; // 字符串结束符
 }
 
-int main()
-{
-   int i=0,k=0,j=1,l,duandian=0;
-   int n,m;
-   int countsub = 0,countadd = 0;
-   bign a,b,c;
-   char s0[85],s1[40],s2[40],sign[4]={[2]='%'};
-   char buf[40];
-   gets(s0);
-   char *p = s0;
-   //存储大数
-   if(s0[0] == '-')
-   {
-       sign[0] = '-';
-       e++;
-       p++;
-   }
-   else
-   {
-       sign[0] = '+';
-   }
+int main() {
+    int i = 0, k = 0, j = 1, l, duandian = 0; // 用于索引和标记的变量
+    int n, m; // 未使用的变量
+    int countsub = 0, countadd = 0; // 减法和加法的计数器
+    bign a, b, c; // 定义三个大数变量用于存储操作数和结果
+    char s0[85], s1[40], s2[40], sign[4] = { [2] = '%' }; // 存储输入的字符串和符号
+    char buf[40]; // 用于存储最终结果的字符串
 
-   while(*p != '\0')
-   {
+    gets(s0); // 读取输入的表达式
+    char *p = s0; // 指针用于遍历输入的字符串
 
-        if(*p == '*')
-        {
-            sign[j] = '*';
+    // 如果输入的第一个字符是负号，设置符号并增加负号计数
+    if (s0[0] == '-') {
+        sign[0] = '-';
+        e++; // e是全局变量，表示负号的个数
+        p++;
+    } else {
+        sign[0] = '+'; // 默认符号为正
+    }
+
+    // 遍历输入的字符串，解析数字和符号
+    while (*p != '\0') {
+        if (*p == '*') {
+            sign[j] = '*'; // 设置乘法符号
             j++;
-            duandian=1;
+            duandian = 1; // 标记下一个字符为数字
         }
-        if(*p == '/')
-        {
-            sign[j] = '/';
+        if (*p == '/') {
+            sign[j] = '/'; // 设置除法符号
             j++;
-            duandian=1;
+            duandian = 1; // 标记下一个字符为数字
         }
-        if(*p == '-')
-        {
-            countsub++;
+        if (*p == '-') {
+            countsub++; // 增加减法计数
             sign[j] = '-';
-            e++;
+            e++; // 增加负号计数
             j++;
-            duandian = 1;
+            duandian = 1; // 标记下一个字符为数字
         }
-        if(*p == '+')
-        {
-            countadd++;//用于乘除时判断正负
-            sign[j] = '+';
+        if (*p == '+') {
+            countadd++; // 增加加法计数
+            sign[j] = '+'; // 设置加法符号
             j++;
-            duandian = 1;
+            duandian = 1; // 标记下一个字符为数字
         }
-        if(isdigit(*p) && duandian == 0)//isdigit如果其中的变量是数字，返回非零值，否则返回0
-        {
-            s1[i] = *p;
+        if (isdigit(*p) && duandian == 0) { // 如果是数字且不是乘除法后的数字
+            s1[i] = *p; // 存储第一个操作数
             i++;
         }
-        if(isdigit(*p) && duandian == 1)
-        {
-            s2[k] = *p;
+        if (isdigit(*p) && duandian == 1) { // 如果是数字且是乘除法后的数字
+            s2[k] = *p; // 存储第二个操作数
             k++;
         }
         p++;
-   }
-   s1[i] = '\0';
-   s2[k] = '\0';
+    }
+    s1[i] = '\0'; // 字符串结束符
+    s2[k] = '\0'; // 字符串结束符
 
-    //转化大数，倒序，方便后面运算
-   a=from_str(s1);
-   b=from_str(s2);
-   //如果负号是奇数个，一定是减法；负号是偶数个，一定是加法
-   switch(sign[1])
-   {
-       case '+': c = add(&a,&b);
-                break;
-       case '-': c = sub(&a,&b);
-                break;
-       case '*': c = mul(&a,&b);
-                break;
-       case '/': c = div(&a,&b);
-                break;
-   }
-   to_str(buf, &c);
-   printf("%s\n",buf);
-   if(sign[1] == '*' || sign[1] == '/')
-   {
-       if((sign[0] == '+' && sign[2] == '-') || (sign[0] == '-' && sign[2] == '%'))
-       {
-            if(sign[0] == '-')
-            {
-                sign[0] = '+';
-                printf("%c%s\n",sign[0],buf);
+    // 将字符串转换为大数
+    a = from_str(s1);
+    b = from_str(s2);
+
+    // 根据操作符执行相应的运算
+    switch (sign[1]) {
+        case '+': c = add(&a, &b); break; // 加法
+        case '-': c = sub(&a, &b); break; // 减法
+        case '*': c = mul(&a, &b); break; // 乘法
+        case '/': c = div(&a, &b); break; // 除法
+    }
+
+    // 将结果转换为字符串并输出
+    to_str(buf, &c);
+    printf("%s\n", buf);
+
+    // 如果是乘法或除法，根据符号输出结果
+    if (sign[1] == '*' || sign[1] == '/') {
+        if (((sign[0] == '+' && sign[2] == '-') || (sign[0] == '-' && sign[2] == '%'))) {
+            if (sign[0] == '-') {
+                sign[0] = '+'; // 改变符号
+                printf("%c%s\n", sign[0], buf);
                 return 0;
             }
-            if(sign[0] == '+')
-            {
-                sign[0] = '-';
-                printf("%c%s\n",sign[0],buf);
+            if (sign[0] == '+') {
+                sign[0] = '-'; // 改变符号
+                printf("%c%s\n", sign[0], buf);
                 return 0;
             }
-       }
-       else
-       {
-            sign[0] = '+';
-            printf("%c%s\n",sign[0],buf);
+        } else {
+            sign[0] = '+'; // 默认符号为正
+            printf("%c%s\n", sign[0], buf);
             return 0;
-       }
-   }
-   if(SIGN%2 == 1)
-   {
-       if(sign[0] == '-')
-       {
-           sign[0] = '+';
-           printf("%c%s\n",sign[0],buf);
-           return 0;
-       }
-       if(sign[0] == '+')
-       {
-           sign[0] = '-';
-           printf("%c%s\n",sign[0],buf);
-           return 0;
-       }
-   }
-   if(SIGN%2 == 0)
-   {
-        printf("%c%s\n",sign[0],buf);
+        }
+    }
+
+    // 根据SIGN的奇偶性输出结果
+    if (SIGN % 2 == 1) {
+        if (sign[0] == '-') {
+            sign[0] = '+'; // 改变符号
+            printf("%c%s\n", sign[0], buf);
+            return 0;
+        }
+        if (sign[0] == '+') {
+            sign[0] = '-'; // 改变符号
+            printf("%c%s\n", sign[0], buf);
+            return 0;
+        }
+    }
+    if (SIGN % 2 == 0) {
+        printf("%c%s\n", sign[0], buf); // 输出结果
         return 0;
-   }
+    }
 }
 ```
 ![屏幕截图 2024-10-23 233727](https://github.com/user-attachments/assets/3442992b-5a57-47dd-abcd-a70be727a293)
