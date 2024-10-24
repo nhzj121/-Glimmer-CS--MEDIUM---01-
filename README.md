@@ -408,109 +408,103 @@ bign from_str(const char* s)
     return t;
 }
 
-bign add(const bign* a,const bign* b)
-{
-    bign t;
+// 大整数加法函数
+bign add(const bign* a, const bign* b) {
+    bign t; // 用于存储结果的临时变量
     int i;
-    t = *a;
-    if(e%2 == 1) return sub(a,b);
-    if(a->n < b->n) return add(b,a);
-    for(i=0; i< t.n;i++)
-    {
+    t = *a; // 将a的值复制到t
+    // 如果bign的位数e是奇数，使用减法代替加法
+    if (e % 2 == 1) return sub(a, b);
+    // 如果a的位数小于b的位数，交换a和b以简化处理
+    if (a->n < b->n) return add(b, a);
+    // 逐位相加，并处理进位
+    for (i = 0; i < t.n; i++) {
         t.d[i] += b->d[i];
-        if(t.d[i] > 9)
-        {
-            t.d[i] -=10;
-            t.d[i+1]++;
+        if (t.d[i] > 9) { // 如果某位的和大于9，进位
+            t.d[i] -= 10;
+            t.d[i + 1]++;
         }
-        if(t.d[t.n]) t.n++;
     }
-    return t;
+    // 如果最高位有进位，增加位数
+    if (t.d[t.n]) t.n++;
+    return t; // 返回结果
 }
 
-bign sub(const bign* a,const bign* b)
-{
-    bign t;
+// 大整数减法函数
+bign sub(const bign* a, const bign* b) {
+    bign t; // 用于存储结果的临时变量
     int i;
-    t = *a;
-    if(e%2 == 0) return add(a,b);
-    if(a->n < b->n || (a->n == b->n && strcmp(a->d, b->d) < 0))
-    {
-        SIGN++;
-        return sub(b,a);
-
+    t = *a; // 将a的值复制到t
+    // 如果bign的位数e是偶数，使用加法代替减法
+    if (e % 2 == 0) return add(a, b);
+    // 如果a的位数小于b的位数或者a小于b，交换a和b并改变符号
+    if (a->n < b->n || (a->n == b->n && strcmp(a->d, b->d) < 0)) {
+        SIGN++; // 改变符号
+        return sub(b, a);
     }
-    for(i=0; i< t.n;i++)
-    {
+    // 逐位相减，并处理借位
+    for (i = 0; i < t.n; i++) {
         t.d[i] -= b->d[i];
-        if(t.d[i] <0)
-        {
-            t.d[i] +=10;
-            t.d[i+1]--;
+        if (t.d[i] < 0) { // 如果某位不够减，借位
+            t.d[i] += 10;
+            t.d[i + 1]--;
         }
     }
-    Remove(&t);
-    return t;
+    Remove(&t); // 移除前导零
+    return t; // 返回结果
 }
 
-bign mul(const bign* a,const bign* b)
-{
-    bign t;
-    int i,j;
-
-    memset(&t ,0 ,sizeof(bign));
-    t.n = a->n + b->n;
-    for(i=0; i< t.n; i++)
-    {
-        for(j=0;j< b->n; j++)
-        {
-            t.d[i+j] += a->d[i] * b->d[j];
-            if(t.d[i+j] > 9)
-            {
-                t.d[i+j+1] += t.d[i+j] / 10;
-                t.d[i+j] %= 10;
+// 大整数乘法函数
+bign mul(const bign* a, const bign* b) {
+    bign t; // 用于存储结果的临时变量
+    int i, j;
+    memset(&t, 0, sizeof(bign)); // 初始化t为0
+    t.n = a->n + b->n; // 结果的位数是a和b的位数之和
+    // 逐位相乘，并处理进位
+    for (i = 0; i < t.n; i++) {
+        for (j = 0; j < b->n; j++) {
+            t.d[i + j] += a->d[i] * b->d[j];
+            if (t.d[i + j] > 9) { // 如果某位的乘积大于9，进位
+                t.d[i + j + 1] += t.d[i + j] / 10;
+                t.d[i + j] %= 10;
             }
         }
     }
-    Remove(&t);
-    return t;
+    Remove(&t); // 移除前导零
+    return t; // 返回结果
 }
 
-int _small(const char a[],int n , const bign* b)
-{
-    const char *pa,*pb;
-
-    if(n < b->n) return 1;
-    if(n == b->n)
-    {
+// 比较字符串a和大整数b的大小
+int _small(const char a[], int n, const bign* b) {
+    const char *pa, *pb;
+    // 如果a的位数小于b的位数，返回1
+    if (n < b->n) return 1;
+    if (n == b->n) { // 如果a和b的位数相同，比较每一位
         pa = a + n - 1;
-        pb = b->d + b->n -1;
-        while(pa >= a && *pa == *pb)
-        {
+        pb = b->d + b->n - 1;
+        while (pa >= a && *pa == *pb) {
             pa--;
             pb--;
         }
-        if(pa >= a && *pa < *pb) return 1;
+        if (pa >= a && *pa < *pb) return 1; // 如果a小于b，返回1
     }
-    return 0;
+    return 0; // 否则返回0
 }
-//对除法的每一步进行减法操作
-int _sub(char a[], int n, const bign* b)
-{
+
+// 对除法的每一步进行减法操作
+int _sub(char a[], int n, const bign* b) {
     char* pa;
     const char* pb;
-    if(_small(a,n,b)) return -1;
+    if (_small(a, n, b)) return -1; // 如果a小于b，返回-1
     pa = a;
     pb = b->d;
-    if(pd)
-    {
+    if (pd) { // 如果有前一次的余数，处理它
         *pa--;
         pd = 0;
     }
-    while(pa < a+n)
-    {
-        if(*pa < *pb)
-        {
+    // 逐位相减，并处理借位
+    while (pa < a + n) {
+        if (*pa < *pb) {
             pa[0] += 10;
             pa[1]--;
         }
@@ -518,68 +512,71 @@ int _sub(char a[], int n, const bign* b)
         pa++;
         pb++;
     }
-    if(*pa < 0)
-    {
+    if (*pa < 0) { // 如果最后一位不够减，借位
         *pa += 10;
         pd = 1;
     }
-    while(n>0 && a[ n - 1] == 0) n--;
-    return n;
+    // 移除尾随零
+    while (n > 0 && a[n - 1] == 0) n--;
+    return n; // 返回新的位数
 }
 
-int div_mod(bign* shang,bign* yu,const bign* a,const bign* b)
-{
-    int m;//表示当前商的位置
-    int t,t0;//余数的位数
-    if(b->n == 0) return 0;
-    memset(shang, 0, sizeof(bign));
-    *yu = *a;
-    shang->n = a->n - b->n + 1;//含0
-    m = shang->n -1;//最高位
+// 大整数除法和取模函数
+int div_mod(bign* shang, bign* yu, const bign* a, const bign* b) {
+    int m; // 表示当前商的位置
+    int t, t0; // 余数的位数
+    if (b->n == 0) return 0; // 如果除数为0，返回0
+    memset(shang, 0, sizeof(bign)); // 初始化商为0
+    *yu = *a; // 将被除数复制到余数
+    shang->n = a->n - b->n + 1; // 商的位数
+    m = shang->n - 1; // 最高位
     t0 = b->n;
-    while(m >= 0)
-    {
-        while(t = _sub(yu->d + m, t0 ,b), t>=0)
-        {
-            t0 = t;
-            shang->d[m]++;
-        }
-        m--;
-        t0++;
-
+    // 进行除法运算
+    // 从最高位开始，逐位计算商
+    while (m >= 0) {
+    // 尝试从余数中减去除数，如果能够减去，则计算下一次减法
+    while ((t = _sub(yu->d + m, t0, b)) >= 0) {
+        // _sub函数尝试从余数的当前部分减去除数b
+        // 如果能够减去（即余数的当前部分大于等于除数），则返回新的余数长度
+        // 并将商的当前位加1
+        t0 = t; // 更新余数的长度为新的余数长度
+        shang->d[m]++; // 将商的当前位加1
     }
-    yu->n = t0 - 1;
-    Remove(yu);
-    Remove(shang);
-    return 1;
+    // 完成当前位的计算后，移动到下一位
+    m--; // 移动到下一位
+    t0++; // 增加余数的长度，因为下一次减法可能会多减一位
+}
+    yu->n = t0 - 1; // 更新余数的位数
+    Remove(yu); // 移除余数的前导零
+    Remove(shang); // 移除商的前导零
+    return 1; // 返回成功
 }
 
-bign div(const bign* a,const bign* b)
-{
+// 大整数除法函数
+bign div(const bign* a, const bign* b) {
     bign shang, yu;
-    div_mod(&shang, &yu,a,b);
-    return shang;
+    div_mod(&shang, &yu, a, b); // 执行除法和取模
+    return shang; // 返回商
 }
 
-bign mod(const bign* a,const bign* b)
-{
+// 大整数取模函数
+bign mod(const bign* a, const bign* b) {
     bign shang, yu;
-    div_mod(&shang, &yu,a,b);
-    return yu;
+    div_mod(&shang, &yu, a, b); // 执行除法和取模
+    return yu; // 返回余数
 }
 
-void to_str(char* buf,const bign* p)
-{
+// 将大整数转换为字符串
+void to_str(char* buf, const bign* p) {
     int i;
-    if(p->n == 0)
-    {
-        strcpy(buf,"0");
+    if (p->n == 0) { // 如果大整数为0，直接返回"0"
+        strcpy(buf, "0");
         return;
     }
-    i=p->n - 1;
-
-    while(i >= 0) *buf++ = p->d[i--] + '0';
-    *buf='\0';
+    i = p->n - 1; // 从最高位开始
+    // 将每一位数字转换为字符并存储到buf中
+    while (i >= 0) *buf++ = p->d[i--] + '0';
+    *buf = '\0'; // 字符串结束符
 }
 
 int main()
